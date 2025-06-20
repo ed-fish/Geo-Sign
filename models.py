@@ -1,11 +1,5 @@
 # models.py
 
-# Uni-Sign  (v4.4 - Corrected)  ----  Hyperbolic branch with selectable text-pose comparison
-# ---------------------------------------------------------------------------
-# * Model produces per-batch eval_figure_data if self.args.eval is True.
-# * Accumulation of multiple eval_figure_data samples is handled by the training script.
-# ---------------------------------------------------------------------------
-
 from __future__ import annotations
 import contextlib, math, warnings
 from typing import Dict
@@ -22,10 +16,10 @@ from geoopt.manifolds import PoincareBall, Euclidean
 GEOOPT_AVAILABLE = True # User hardcoded
 
 # ---------- project-specific --------------------------------------------------
-# Assuming these exist and are correctly implemented
+
 from stgcn_layers import Graph, get_stgcn_chain
-from config          import mt5_path
-# Assuming utils contains is_main_process for debug prints, otherwise remove the check
+from config import mt5_path
+
 try:
     from utils import is_main_process
 except ImportError:
@@ -122,7 +116,7 @@ if PoincareBall is not None: # Effectively always true given GEOOPT_AVAILABLE = 
         return mu
 
 # ============================================================================ #
-#  Uni-Sign Model
+#  Original Uni-Sign Model with added Hyperbolic Projections
 # ============================================================================ #
 class Uni_Sign(nn.Module):
 
@@ -213,7 +207,7 @@ class Uni_Sign(nn.Module):
         out, compute_dtype = {}, self.pose_proj.weight.dtype
         autocast_ctx = contextlib.nullcontext() # Assuming AMP is handled by DeepSpeed or externally
 
-        # ========== 1. Pose encoding =======================================
+        # ========== Pose encoding =======================================
         with autocast_ctx:
             feats, pooled, body_feat = [], {}, None
             active_modes = [m for m in self.modes if m in src_input]
@@ -238,7 +232,7 @@ class Uni_Sign(nn.Module):
                 pose_features_biased = concatenated_feats + self.part_para
             pose_emb = self.pose_proj(pose_features_biased)
 
-            # ========== 2. mT5  ============================================
+            # ========== mT5  ============================================
             prefix_ids    = src_input["prefix_ids"].long()
             prefix_mask   = src_input["prefix_mask"]
             inputs_embeds = torch.cat([self.mt5_model.encoder.embed_tokens(prefix_ids), pose_emb], dim=1)
@@ -256,7 +250,7 @@ class Uni_Sign(nn.Module):
                                       ignore_index=-100)
             out["ce_loss"] = ce_loss.detach()
 
-        # ========== 3. Hyperbolic branch ====================================
+        # ========== Hyperbolic branch ====================================
         margin_loss = torch.tensor(0.0, device=ce_loss.device)
         # Default alpha for CE loss, gets updated if hyperbolic branch runs
         alpha_scalar = torch.tensor(getattr(self.args, 'alpha', 1.0), device=ce_loss.device)
@@ -311,18 +305,6 @@ class Uni_Sign(nn.Module):
                         geom_out = self.geom_loss.pair_loss(mu_mfd, hyp_text_p)
                         margin_loss = geom_out["loss"]
                     elif self.text_cmp_mode == "token":
-                        # The 'token' mode logic from your provided code (FIX 7 and related)
-                        # Assuming it correctly calculates margin_loss and populates geom_out
-                        # And defines hyp_text (projected tokens), attn_weights, text_context
-                        # For brevity, I'm not replicating the full complex token mode here,
-                        # but ensure it's the version from your "v4.4 Corrected" file.
-                        # Placeholder - this section needs your full corrected token mode logic
-                        # Example of expected outputs from that logic:
-                        # hyp_text = self.hyp_proj_text(txt_e.float()) # (B, T_tgt, H)
-                        # pose_parts = pose_points_stacked.permute(1,0,2) # (B,P,H)
-                        # ... (calculations for attn_weights, text_context) ...
-                        # ... (calculations for margin_loss and geom_out) ...
-                        # Fallback if token mode logic is not pasted back here:
                         if not geom_out: # If token mode not fully implemented here for brevity
                              warnings.warn("Token mode contrastive loss not fully shown here, using pooled as fallback for example structure.", RuntimeWarning)
                              txt_mean = (txt_e * mask_bool.unsqueeze(-1).float()).sum(dim=1) / mask_bool.float().sum(dim=1, keepdim=True).clamp_min(1)
@@ -332,6 +314,7 @@ class Uni_Sign(nn.Module):
                              hyp_text = hyp_text_p # For eval_figure_data consistency
 
                     # --- Populate eval_figure_data FOR CURRENT BATCH if in global eval mode ---
+                    # Uncomment this section if you want to store tensors for eval
                     if self.args.eval: # Check global CLI --eval flag
                         temp_tensors = {}
                         if 'hyp_body' in locals() and hyp_body is not None: temp_tensors["hyp_body"] = hyp_body.detach().cpu()
@@ -353,7 +336,7 @@ class Uni_Sign(nn.Module):
                         
                         if temp_tensors and is_main_process(): # Log if tensors are populated
                              print(f"[DEBUG model.forward] Populated current_step_eval_tensors_for_out with keys: {list(temp_tensors.keys())}")
-                        current_step_eval_tensors_for_out = temp_tensors
+                        current_step_eval_tensors_for_out = temp_tensorsV
 
                     # ---- Loss Blend ----
                     prog = self.global_step.item() / self.total_steps if self.total_steps > 0 else 0
@@ -384,10 +367,7 @@ class Uni_Sign(nn.Module):
         if self.use_hyp and GEOOPT_AVAILABLE and geom_out: # If hyp branch ran successfully and produced geom_out
             # alpha_scalar would have been updated by the loss blend logic inside the hyp branch
             loss = alpha_scalar * ce_loss.float() + (1 - alpha_scalar) * margin_loss
-        # If hyp branch was intended but skipped (e.g. missing pooled), geom_out would be {},
-        # so margin_loss remains 0 and alpha_scalar remains its default (self.args.alpha).
-        # loss then becomes self.args.alpha * ce_loss. If alpha is 1.0, it's just ce_loss.
-
+            
         # ========== 4. Outputs =============================================
         out.update({
             "loss": loss,
@@ -447,7 +427,7 @@ class Uni_Sign(nn.Module):
         )
 
 # ============================================================================ #
-#  (deprecated) helper – kept for checkpoint compatibility
+#  (deprecated) helper – kept for checkpoint compatibility with original UniSign
 # ============================================================================ #
 def get_requires_grad_dict(model: nn.Module) -> Dict[str, torch.Tensor]:
     # ... (Your existing get_requires_grad_dict method) ...
