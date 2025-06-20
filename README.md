@@ -1,18 +1,41 @@
-<center><img src="https://github.com/user-attachments/assets/5e519f81-db4c-4f44-802f-bce208399d1c" alt="drawing" width="300"/></center>
+<div align="center">
 
-# Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Language Translation
+<!-- logo / teaser image -->
+<img src="https://github.com/user-attachments/assets/5e519f81-db4c-4f44-802f-bce208399d1c"
+     alt="Geo-Sign logo" width="300"/>
 
-[![arXiv](https://img.shields.io/badge/arXiv-2506.00129-b31b1b.svg)](https://arxiv.org/abs/2506.00129)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/geo-sign-hyperbolic-contrastive-1/gloss-free-sign-language-translation-on-csl)](https://paperswithcode.com/sota/gloss-free-sign-language-translation-on-csl?p=geo-sign-hyperbolic-contrastive-1)
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Model-fiskenai/Geo--Sign-yellow)](https://huggingface.co/fiskenai/Geo-Sign)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+<!-- title -->
+<h1>
+Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Language Translation
+</h1>
 
-![Tags](https://img.shields.io/badge/Transformers-Library-blue)
-![Tags](https://img.shields.io/badge/CSL--Daily-Dataset-orange)
-![Tags](https://img.shields.io/badge/CSL--News-Dataset-orange)
-![Tags](https://img.shields.io/badge/Chinese-Language-red)
-![Tags](https://img.shields.io/badge/sign--language--translation-Task-success)
-![Tags](https://img.shields.io/badge/hyperbolic--geometry-Technique-purple)
+<!-- primary badges -->
+<a href="https://arxiv.org/abs/2506.00129">
+  <img src="https://img.shields.io/badge/arXiv-2506.00129-b31b1b.svg"/>
+</a>
+<a href="https://paperswithcode.com/sota/gloss-free-sign-language-translation-on-csl?p=geo-sign-hyperbolic-contrastive-1">
+  <img src="https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/geo-sign-hyperbolic-contrastive-1/gloss-free-sign-language-translation-on-csl"/>
+</a>
+<a href="https://huggingface.co/fiskenai/Geo-Sign">
+  <img src="https://img.shields.io/badge/%F0%9F%A4%97%20Model-fiskenai/Geo--Sign-yellow"/>
+</a>
+<a href="https://opensource.org/licenses/MIT">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg"/>
+</a>
+
+<!-- line break between rows (optional) -->
+<br/>
+
+<!-- “tag” badges -->
+<img src="https://img.shields.io/badge/Transformers-Library-blue"/>
+<img src="https://img.shields.io/badge/CSL--Daily-Dataset-orange"/>
+<img src="https://img.shields.io/badge/CSL--News-Dataset-orange"/>
+<img src="https://img.shields.io/badge/Chinese-Language-red"/>
+<img src="https://img.shields.io/badge/sign--language--translation-Task-success"/>
+<img src="https://img.shields.io/badge/hyperbolic--geometry-Technique-purple"/>
+
+</div>
+
 
 This is the official implementation of the paper **"[Hyperbolic Contrastive Regularisation for Geometrically Aware Sign Language Translation](https://arxiv.org/abs/2506.00129)"** (Under Review).
 
