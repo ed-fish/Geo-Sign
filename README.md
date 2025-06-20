@@ -73,7 +73,7 @@ Geo-Sign outperforms all previous gloss-free pose-only methods and rivals many R
 
 ### 1. Clone the GitHub Repository
 ```bash
-git clone [https://github.com/ed-fish/geo-sign](https://github.com/ed-fish/geo-sign)
+git clone https://github.com/ed-fish/geo-sign
 cd geo-sign
 ```
 
