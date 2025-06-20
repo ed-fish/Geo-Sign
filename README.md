@@ -7,4 +7,8 @@
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/geo-sign-hyperbolic-contrastive-1/gloss-free-sign-language-translation-on-csl)](https://paperswithcode.com/sota/gloss-free-sign-language-translation-on-csl?p=geo-sign-hyperbolic-contrastive-1)
 
 
-Code coming soon! (Check back around mid June) Please star this repo to keep updated. 
+Code is here! 
+
+Weights are here: https://huggingface.co/fiskenai/Geo-Sign
+
+Hold tight for run instructions! (Working on it now)
