@@ -34,7 +34,7 @@ Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Lan
 <img src="https://img.shields.io/badge/sign--language--translation-Task-success"/>
 <img src="https://img.shields.io/badge/hyperbolic--geometry-Technique-purple"/>
 
-<img src="https://github.com/user-attachments/assets/55065fb2-ebe2-41ff-a374-1c5899aae8d3"/>
+<img src="https://github.com/user-attachments/assets/55065fb2-ebe2-41ff-a374-1c5899aae8d3" width="400" />
 </div>
 
 
