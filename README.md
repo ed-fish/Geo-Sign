@@ -91,6 +91,8 @@ You will need to download several files and place them in the correct directorie
     * Download the entire `Data` folder -> Place at the root of the repo: `./Data/`
 * **From [google/mt5-base on Hugging Face](https://huggingface.co/google/mt5-base):**
     * Download the model files and place them in `./pretrained_weight/mt5-base`.
+* **From the [Uni-Sign Hugging Face Repo](https://huggingface.co/ZechengLi19/Uni-Sign/tree/main):**
+  * Download the Poses for CSL Daily (and CSL News if you want to pretrain the hyperbolic model). Link to them in the `config.py` file
 
 You can use the following Python snippet to download the mT5 model easily:
 ```python
