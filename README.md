@@ -59,6 +59,16 @@ This code is largely based on the Uni-Sign [ICLR 2025] project: https://github.c
 * **Distributed Training**: Full support for efficient, multi-GPU training using [DeepSpeed](https://github.com/microsoft/deepspeed).
 * **Experiment Tracking**: Integrated with [Weights & Biases](https://wandb.ai) for easy logging and visualization.
 
+  ## To-Do / Future Work
+- [ ] Add support for additional sign language datasets (e.g How2Sign, YT-ASL).
+- [ ] Explore different hyperbolic manifolds beyond the Poincaré ball.
+- [ ] Develop more advanced visualization tools for geometric embeddings.
+- [ ] Release a Gradio/Streamlit demo for interactive translation.
+- [ ] Extend Hyperbolic embeddings to ST-GCN.
+- [ ] Perform Hyperbolic pretraining on CSL News.
+
+Want to help? Drop me an email and let's write a Geo-Sign++ paper! 
+
 ## Evaluation
 | Method | Pose | RGB | Dev B-1 | Dev B-4 | Dev R-L | Test B-1 | Test B-4 | Test R-L |
 | :--- | :--: | :--: | :---: | :---: | :---: | :---: | :---: | :---: |
