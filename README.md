@@ -42,6 +42,9 @@ This is the official implementation of the paper **"[Hyperbolic Contrastive Regu
 Geo-Sign projects pose-based sign-language features into a learnable **Poincaré ball** and aligns them with text embeddings via a geometric contrastive loss. This approach improves translation performance by enhancing the model's understanding of the hierarchical relationships between different body parts (body, hands, face).
 
 Compared with the strong Uni-Sign pose baseline, Geo-Sign boosts BLEU-4 by **+1.81** and ROUGE-L by **+3.03** on the CSL-Daily benchmark while keeping privacy-friendly skeletal inputs only.
+
+This code is largely based on the Uni-Sign [ICLR 2025] project: https://github.com/ZechengLi19/Uni-Sign - we simply add hyperbolic regularisation on top of their method. If you use this code base you must also cite their work and give their repo a star. Thanks to the authors for help with the code setup and weights. 
+
 <div align="center">
 <img src="https://github.com/user-attachments/assets/55065fb2-ebe2-41ff-a374-1c5899aae8d3" width="600" />
 </div>
@@ -57,9 +60,29 @@ Compared with the strong Uni-Sign pose baseline, Geo-Sign boosts BLEU-4 by **+1.
 * **Experiment Tracking**: Integrated with [Weights & Biases](https://wandb.ai) for easy logging and visualization.
 
 ## Evaluation
-| Dataset          | Modality   | BLEU-4 ↑ | ROUGE-L ↑ |
-| ---------------- | ---------- | -------- | --------- |
-| **CSL-Daily (test)** | Pose-only  | **27.42** | **57.95** |
+| Method | Pose | RGB | Dev B-1 | Dev B-4 | Dev R-L | Test B-1 | Test B-4 | Test R-L |
+| :--- | :--: | :--: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **_Gloss-Based Methods (Prior Art)_** | | | | | | | | |
+| SLRT [6] | – | ✓ | 37.47 | 11.88 | 37.96 | 37.38 | 11.79 | 36.74 |
+| TS-SLT [9] | ✓ | ✓ | 55.21 | 25.76 | 55.10 | 55.44 | 25.79 | 55.72 |
+| CV-SLT [79] | – | ✓ | – | 28.24 | 56.36 | 58.29 | 28.94 | 57.06 |
+| **_Gloss-Free Methods (Prior Art)_** | | | | | | | | |
+| MSLU [83] | ✓ | – | 33.28 | 10.27 | 33.13 | 33.97 | 11.42 | 33.80 |
+| SLRT [code](https://github.com/FangyunWei/SLRT) (Gloss-Free) | – | ✓ | 21.03 | 4.04 | 20.51 | 20.00 | 3.03 | 19.67 |
+| GASLT [code](https://github.com/YinAoXiong/GASLT) | – | ✓ | – | – | – | 19.90 | 4.07 | 20.35 |
+| GFSLT-VLP [code](https://github.com/zhoubenjia/GFSLT-VLP) | – | ✓ | 39.20 | 11.07 | 36.70 | 39.37 | 11.00 | 36.44 |
+| FLa-LLM [paper](https://arxiv.org/abs/2403.12556) | – | ✓ | – | – | – | 37.13 | 14.20 | 37.25 |
+| Sign2GPT [code](https://github.com/ryanwongsa/Sign2GPT) | – | ✓ | – | – | – | 41.75 | 15.40 | 42.36 |
+| SignLLM [Project](https://signllm.github.io/) | – | ✓ | 42.45 | 12.23 | 39.18 | 39.55 | 15.75 | 39.91 |
+| C2RL [paper](https://arxiv.org/html/2408.09949v1) | – | ✓ | – | – | – | 49.32 | 21.61 | 48.21 |
+| **_Our Models and Baselines_** | | | | | | | | |
+| Uni-Sign [code](https://github.com/ZechengLi19/Uni-Sign) (Pose) | ✓ | – | 53.24 | 25.27 | 54.34 | 53.86 | 25.61 | 54.92 |
+| Uni-Sign [code](https://github.com/ZechengLi19/Uni-Sign) | ✓ | ✓ | 55.30 | 26.25 | 56.03 | 55.08 | 26.36 | 56.51 |
+| Geo-Sign (Euclidean Pooled) | ✓ | – | 53.53 | 25.78 | 55.38 | 53.06 | 25.72 | 55.57 |
+| Geo-Sign (Euclidean Token) | ✓ | – | 53.93 | 25.91 | 55.20 | 54.02 | 25.98 | 53.93 |
+| Geo-Sign (Hyperbolic Pooled) | ✓ | – | 55.19 | 26.90 | 56.93 | 55.80 | 27.17 | 57.75 |
+| **Geo-Sign (Hyperbolic Token)** | **✓** | **–** | **55.57** | **27.05** | **57.27** | **55.89** | **27.42** | **57.95** |
+
 
 Geo-Sign outperforms all previous gloss-free pose-only methods and rivals many RGB- or gloss-based systems.
 
