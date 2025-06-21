@@ -53,7 +53,6 @@ Compared with the strong Uni-Sign pose baseline, Geo-Sign boosts BLEU-4 by **+1.
 * **Hyperbolic Contrastive Regularization**: Novel loss function in Poincaré space to learn geometrically structured representations.
 * **ST-GCN Backbone**: Utilizes Spatio-Temporal Graph Convolutional Networks to effectively model pose dynamics.
 * **mT5 Integration**: Leverages a pre-trained mT5 model for powerful sequence-to-sequence translation.
-* **Multi-Dataset Support**: Natively supports `CSL-Daily`, `CSL-News`, and `WLASL`.
 * **Distributed Training**: Full support for efficient, multi-GPU training using [DeepSpeed](https://github.com/microsoft/deepspeed).
 * **Experiment Tracking**: Integrated with [Weights & Biases](https://wandb.ai) for easy logging and visualization.
 
