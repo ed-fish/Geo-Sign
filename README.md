@@ -33,10 +33,7 @@ Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Lan
 <img src="https://img.shields.io/badge/Chinese-Language-red"/>
 <img src="https://img.shields.io/badge/sign--language--translation-Task-success"/>
 <img src="https://img.shields.io/badge/hyperbolic--geometry-Technique-purple"/>
-
-<img src="https://github.com/user-attachments/assets/55065fb2-ebe2-41ff-a374-1c5899aae8d3" width="600" />
 </div>
-
 
 
 
@@ -45,6 +42,10 @@ This is the official implementation of the paper **"[Hyperbolic Contrastive Regu
 Geo-Sign projects pose-based sign-language features into a learnable **Poincaré ball** and aligns them with text embeddings via a geometric contrastive loss. This approach improves translation performance by enhancing the model's understanding of the hierarchical relationships between different body parts (body, hands, face).
 
 Compared with the strong Uni-Sign pose baseline, Geo-Sign boosts BLEU-4 by **+1.81** and ROUGE-L by **+3.03** on the CSL-Daily benchmark while keeping privacy-friendly skeletal inputs only.
+<div align="center">
+<img src="https://github.com/user-attachments/assets/55065fb2-ebe2-41ff-a374-1c5899aae8d3" width="600" />
+</div>
+
 
 ---
 
@@ -140,6 +141,9 @@ deepspeed --num_gpus 1 fine_tuning.py \
   --hyp_text_cmp token \
   --alpha 0.7
 ```
+
+To change from the `token` method to the `pooled` method as described in the paper - simply change the `--hyp_text_cmp_token` flag. 
+To test Euclidean baselines you can either remove `--use_hyperbolic` which will remove all regularisation (i.e Uni-Sign Pose baseline), or set `--init_c` to 0.001 which will still perform regularisation but projections are basically euclidean.
 
 ### Multi-GPU Training
 To train on multiple GPUs, simply change the `--num_gpus` argument in the `deepspeed` command to the number of GPUs you want to use. DeepSpeed will handle the rest.
