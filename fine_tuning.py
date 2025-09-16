@@ -1,12 +1,7 @@
 # finetuning.py
 
-# Uni-Sign (v4) Training Script - Aligned with User-Provided Structure
+# Geo-Sign
 # ---------------------------------------------------------------------------------
-# * Assumes arguments (--hyp_lr, --use_hyperbolic, etc.) are parsed externally.
-# * Integrates dual optimizer setup (Euclidean via DeepSpeed, Hyperbolic manual).
-# * Uses user-provided checkpointing (`get_requires_grad_dict`) with warnings.
-# * Includes WandB logging and task-specific evaluation.
-# * Implements accumulation of eval_figure_data in finetuning.py evaluate function.
 
 # --- Standard Imports ---
 import os
@@ -274,56 +269,55 @@ def main(args):
                 save_payload['hyp_optimizer'] = hyp_optimizer.state_dict()
             utils.save_on_master(save_payload, checkpoint_path)
 
-        if rank == 0: 
-            print(f"--- Running evaluation for Epoch {epoch} on Rank 0 ---")
-            test_stats_dev = evaluate(args, dev_dataloader, model, model_without_ddp, phase='dev')
-            test_stats_test = evaluate(args, test_dataloader, model, model_without_ddp, phase='test')
+        print(f"--- Running evaluation for Epoch {epoch} on Rank 0 ---")
+        test_stats_dev = evaluate(args, dev_dataloader, model, model_without_ddp, phase='dev')
+        test_stats_test = evaluate(args, test_dataloader, model, model_without_ddp, phase='test')
 
-            save_best = False
-            metric_key, current_metric = "", 0.0
-            if args.task == "SLT":
-                metric_key, current_metric = "bleu4", test_stats_dev.get("bleu4", 0.0)
-                if current_metric > max_accuracy: save_best = True
-            elif args.task == "ISLR":
-                metric_key, current_metric = "top1_acc_pi", test_stats_dev.get("top1_acc_pi", 0.0)
-                if current_metric > max_accuracy: save_best = True
-            elif args.task == "CSLR":
-                metric_key, current_metric = "wer", test_stats_dev.get("wer", 1000.0)
-                if current_metric < max_accuracy: save_best = True
-            
-            if save_best:
-                print(f"*** New best {metric_key}: {current_metric:.2f} (Epoch {epoch}) ***")
-                max_accuracy = current_metric
-                if output_dir:
-                    best_checkpoint_path = output_dir / 'best_checkpoint.pth'
-                    model_state_to_save_best = model_without_ddp.state_dict()
-                    best_payload = {
-                        'model': model_state_to_save_best, 'epoch': epoch, 'args': vars(args),
-                        f'best_{metric_key}': max_accuracy,
-                        'global_step': model_without_ddp.global_step.item() if hasattr(model_without_ddp, 'global_step') else 0
-                    }
-                    if hyp_optimizer:
-                         best_payload['hyp_optimizer'] = hyp_optimizer.state_dict()
-                    utils.save_on_master(best_payload, best_checkpoint_path)
-
-            print(f'Current best {metric_key}: {max_accuracy:.2f}')
-
-            log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
-                         **{f'dev_{k}': v for k, v in test_stats_dev.items()},
-                         **{f'test_{k}': v for k, v in test_stats_test.items()},
-                         'epoch': epoch, 'n_parameters': n_parameters}
+        save_best = False
+        metric_key, current_metric = "", 0.0
+        if args.task == "SLT":
+            metric_key, current_metric = "bleu4", test_stats_dev.get("bleu4", 0.0)
+            if current_metric > max_accuracy: save_best = True
+        elif args.task == "ISLR":
+            metric_key, current_metric = "top1_acc_pi", test_stats_dev.get("top1_acc_pi", 0.0)
+            if current_metric > max_accuracy: save_best = True
+        elif args.task == "CSLR":
+            metric_key, current_metric = "wer", test_stats_dev.get("wer", 1000.0)
+            if current_metric < max_accuracy: save_best = True
+        
+        if save_best:
+            print(f"*** New best {metric_key}: {current_metric:.2f} (Epoch {epoch}) ***")
+            max_accuracy = current_metric
             if output_dir:
-                try:
-                    with (output_dir / "log.txt").open("a") as f: f.write(json.dumps(log_stats) + "\n")
-                except IOError as e: print(f"[Rank 0] Error writing to log.txt: {e}")
-            
-            if args.wandb and args.wandb_run:
-                wandb_epoch_log = {f"epoch_train_avg/{k}": v for k,v in train_stats.items()}
-                wandb_epoch_log.update({f"epoch_dev_avg/{k}": v for k,v in test_stats_dev.items()})
-                wandb_epoch_log.update({f"epoch_test_avg/{k}": v for k,v in test_stats_test.items()})
-                wandb_epoch_log["epoch"] = epoch
-                current_global_step_val = model_without_ddp.global_step.item() if hasattr(model_without_ddp, 'global_step') else (epoch + 1) * num_update_steps_per_epoch
-                args.wandb_run.log(wandb_epoch_log, step=int(current_global_step_val))
+                best_checkpoint_path = output_dir / 'best_checkpoint.pth'
+                model_state_to_save_best = model_without_ddp.state_dict()
+                best_payload = {
+                    'model': model_state_to_save_best, 'epoch': epoch, 'args': vars(args),
+                    f'best_{metric_key}': max_accuracy,
+                    'global_step': model_without_ddp.global_step.item() if hasattr(model_without_ddp, 'global_step') else 0
+                }
+                if hyp_optimizer:
+                     best_payload['hyp_optimizer'] = hyp_optimizer.state_dict()
+                utils.save_on_master(best_payload, best_checkpoint_path)
+
+        print(f'Current best {metric_key}: {max_accuracy:.2f}')
+
+        log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
+                     **{f'dev_{k}': v for k, v in test_stats_dev.items()},
+                     **{f'test_{k}': v for k, v in test_stats_test.items()},
+                     'epoch': epoch, 'n_parameters': n_parameters}
+        if output_dir:
+            try:
+                with (output_dir / "log.txt").open("a") as f: f.write(json.dumps(log_stats) + "\n")
+            except IOError as e: print(f"[Rank 0] Error writing to log.txt: {e}")
+        
+        if args.wandb and args.wandb_run:
+            wandb_epoch_log = {f"epoch_train_avg/{k}": v for k,v in train_stats.items()}
+            wandb_epoch_log.update({f"epoch_dev_avg/{k}": v for k,v in test_stats_dev.items()})
+            wandb_epoch_log.update({f"epoch_test_avg/{k}": v for k,v in test_stats_test.items()})
+            wandb_epoch_log["epoch"] = epoch
+            current_global_step_val = model_without_ddp.global_step.item() if hasattr(model_without_ddp, 'global_step') else (epoch + 1) * num_update_steps_per_epoch
+            args.wandb_run.log(wandb_epoch_log, step=int(current_global_step_val))
 
         if world_size > 1 and utils.dist.is_initialized(): utils.dist.barrier()
 
