@@ -6,7 +6,7 @@
 
 <!-- title -->
 <h1>
-Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Language Translation
+[NeurIPS 2025] Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Language Translation
 </h1>
 
 <!-- primary badges -->
@@ -37,7 +37,7 @@ Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Lan
 
 
 
-This is the official implementation of the paper **"[Hyperbolic Contrastive Regularisation for Geometrically Aware Sign Language Translation](https://arxiv.org/abs/2506.00129)"** (Under Review).
+This is the official implementation of the paper **"[Hyperbolic Contrastive Regularisation for Geometrically Aware Sign Language Translation](https://arxiv.org/abs/2506.00129)"**.
 
 Geo-Sign projects pose-based sign-language features into a learnable **Poincaré ball** and aligns them with text embeddings via a geometric contrastive loss. This approach improves translation performance by enhancing the model's understanding of the hierarchical relationships between different body parts (body, hands, face).
 
