@@ -305,14 +305,49 @@ class Uni_Sign(nn.Module):
                         geom_out = self.geom_loss.pair_loss(mu_mfd, hyp_text_p)
                         margin_loss = geom_out["loss"]
                     elif self.text_cmp_mode == "token":
-                        if not geom_out: # If token mode not fully implemented here for brevity
-                             warnings.warn("Token mode contrastive loss not fully shown here, using pooled as fallback for example structure.", RuntimeWarning)
-                             txt_mean = (txt_e * mask_bool.unsqueeze(-1).float()).sum(dim=1) / mask_bool.float().sum(dim=1, keepdim=True).clamp_min(1)
-                             hyp_text_p = self.hyp_proj_text(txt_mean.float())
-                             geom_out = self.geom_loss.pair_loss(mu_mfd, hyp_text_p)
-                             margin_loss = geom_out["loss"]
-                             hyp_text = hyp_text_p # For eval_figure_data consistency
+                        B, K, D = pose_points_stacked.shape[1], pose_points_stacked.shape[0], self.hyp_dim
 
+                        # (a) Hyperbolic Tokenization (Values)
+                        # Project all Euclidean text tokens to hyperbolic space. These are the 'values'.
+                        hyp_text_tokens = self.hyp_proj_text(txt_e.float()) # Shape: (B, T, D)
+
+                        # (b) Hyperbolic Attention
+                        # (b.1) Queries from pose parts.
+                        # Reshape from (K, B, D) -> (B, K, 1, D) for broadcasting.
+                        queries = pose_points_stacked.transpose(0, 1).unsqueeze(2)
+
+                        # (b.2) Create attention keys via Möbius transformation (M ⊗c v + b).
+                        # We unsqueeze hyp_text_tokens to (B, 1, T, D) to broadcast against K queries.
+                        keys = self.manifold.mobius_add(
+                            self.manifold.mobius_matvec(self.hyp_attn_W, hyp_text_tokens.unsqueeze(1)),
+                            self.hyp_attn_b,
+                            project=True
+                        )
+
+                        # (b.3) Compute attention scores: negative geodesic distance.
+                        attn_logits = -self.manifold.dist(queries, keys) # Shape: (B, K, T)
+
+                        # (b.4) Apply padding mask and softmax to get attention weights.
+                        attn_logits = attn_logits.masked_fill(~mask_bool.unsqueeze(1), -torch.inf)
+                        attn_weights = attn_logits.softmax(dim=-1) # Shape: (B, K, T)
+
+                        # (b.5) Compute context vectors {cp} as hyperbolic weighted midpoint of the values.
+                        # This computes K distinct context vectors for each item in the batch.
+                        text_contexts = self.manifold.weighted_midpoint(
+                            hyp_text_tokens.unsqueeze(1), # Values
+                            weights=attn_weights,         # Weights
+                            dim=2,                        # Aggregate over the token dimension (T)
+                            project=True
+                        ) # Shape: (B, K, D)
+
+                        # (c) Compute final loss: average of K contrastive losses.
+                        # Reshape poses and contexts to (B*K, D) to compute loss in one batch.
+                        all_poses = pose_points_stacked.transpose(0, 1).reshape(B * K, -1)
+                        all_texts = text_contexts.reshape(B * K, -1)
+
+                        geom_out = self.geom_loss.pair_loss(all_poses, all_texts)
+                        margin_loss = geom_out["loss"]
+                       
                     # --- Populate eval_figure_data FOR CURRENT BATCH if in global eval mode ---
                     # Uncomment this section if you want to store tensors for eval
                     if self.args.eval: # Check global CLI --eval flag
