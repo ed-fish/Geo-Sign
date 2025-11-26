@@ -1,10 +1,7 @@
 <div align="center">
 
-<!-- logo / teaser image -->
-<img src="[https://github.com/user-attachments/assets/5e519f81-db4c-4f44-802f-bce208399d1c](https://github.com/user-attachments/assets/105b8072-4e6d-439b-9799-4c7fbf886039)"
-     alt="Geo-Sign logo" width="300"/>
+<!-- title --><img width="3859" height="706" alt="new_logo" src="https://github.com/user-attachments/assets/574a6073-db9d-436b-8c39-de1aa2c6518c" />
 
-<!-- title -->
 <h1>
 [NeurIPS 2025] Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Language Translation
 </h1>
