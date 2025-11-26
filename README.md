@@ -6,6 +6,10 @@
 [NeurIPS 2025] Geo-Sign: Hyperbolic Contrastive Regularisation for Geometrically-Aware Sign-Language Translation
 </h1>
 
+<h3><div align="center">
+  Come visit my poster next week at Neurips! https://neurips.cc/virtual/2025/loc/san-diego/poster/117570
+</div></h3>
+
 <!-- primary badges -->
 <a href="https://arxiv.org/abs/2506.00129">
   <img src="https://img.shields.io/badge/arXiv-2506.00129-b31b1b.svg"/>
@@ -31,7 +35,6 @@
 <img src="https://img.shields.io/badge/sign--language--translation-Task-success"/>
 <img src="https://img.shields.io/badge/hyperbolic--geometry-Technique-purple"/>
 </div>
-
 
 
 This is the official implementation of the paper **"[Hyperbolic Contrastive Regularisation for Geometrically Aware Sign Language Translation](https://arxiv.org/abs/2506.00129)"**.
